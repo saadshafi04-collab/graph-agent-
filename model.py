@@ -29,18 +29,20 @@ def init_db():
 
     start_date = datetime(2026, 1, 1)
 
-    for asset in assets:
-        for day in range(90):
-            date = start_date + timedelta(days=day)
-            utilization = round(random.uniform(0, 100), 2)
-            status = "idle" if utilization < 10 else "busy"
+    cursor.execute("SELECT COUNT(*) FROM measurements")
+    if cursor.fetchone()[0] == 0:
+        for asset in assets:
+            for day in range(90):
+                date = start_date + timedelta(days=day)
+                utilization = round(random.uniform(0, 100), 2)
+                status = "idle" if utilization < 10 else "busy"
 
-            for m_type, (unit, min_val, max_val) in measurement_types.items():
-                value = round(random.uniform(min_val, max_val), 3)
-                cursor.execute(
-                    "INSERT INTO measurements (asset_name, measurement_type, value, unit, recorded_at, utilization, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (asset, m_type, value, unit, date.strftime("%Y-%m-%d"), utilization, status)
-                )
+                for m_type, (unit, min_val, max_val) in measurement_types.items():
+                    value = round(random.uniform(min_val, max_val), 3)
+                    cursor.execute(
+                        "INSERT INTO measurements (asset_name, measurement_type, value, unit, recorded_at, utilization, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (asset, m_type, value, unit, date.strftime("%Y-%m-%d"), utilization, status)
+                    )
 
     conn.commit()
     conn.close()

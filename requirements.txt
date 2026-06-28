@@ -1,4 +1,5 @@
 anthropic
-streamlit
+fastapi
+uvicorn
 matplotlib
 python-dotenv

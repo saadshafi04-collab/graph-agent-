@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Monitoring Agent</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --bg:              #0a0a0a;
+      --surface:         rgba(255,255,255,0.05);
+      --surface-hover:   rgba(255,255,255,0.08);
+      --glass:           rgba(255,255,255,0.04);
+      --border:          rgba(255,255,255,0.08);
+      --border-strong:   rgba(255,255,255,0.13);
+      --accent:          #a3e635;
+      --accent-hover:    #bef264;
+      --accent-dim:      rgba(163,230,53,0.12);
+      --accent-glow:     rgba(163,230,53,0.25);
+      --text-primary:    #f5f5f4;
+      --text-secondary:  #a8a29e;
+      --text-muted:      #57534e;
+      --warning:         #f59e0b;
+      --warning-dim:     rgba(245,158,11,0.12);
+      --blue:            #38bdf8;
+      --blue-dim:        rgba(56,189,248,0.12);
+      --r-sm:  6px;
+      --r-md:  10px;
+      --r-lg:  14px;
+      --r-xl:  20px;
+      --topnav-h: 52px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ===== TOPNAV ===== */
+    .topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--topnav-h);
+      background: rgba(10,10,10,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+    .topnav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      animation: pulse-dot 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--accent-glow); }
+      50%       { opacity: 0.55; transform: scale(0.8); box-shadow: 0 0 4px var(--accent-glow); }
+    }
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pill {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .pill-live {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(163,230,53,0.2);
+    }
+    .pill-meta {
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* ===== LAYOUT ===== */
+    .main {
+      display: flex;
+      height: 100vh;
+      padding-top: var(--topnav-h);
+    }
+
+    /* ===== MAP PANEL ===== */
+    .map-panel {
+      flex: 0 0 62%;
+      position: relative;
+      border-right: 1px solid var(--border);
+    }
+    #map { width: 100%; height: 100%; }
+
+    .leaflet-tile-pane         { filter: brightness(0.88) contrast(1.06) saturate(0.7); }
+    .leaflet-control-attribution { display: none; }
+    .leaflet-control-zoom a {
+      background: rgba(18,18,18,0.9) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border) !important;
+      backdrop-filter: blur(8px);
+    }
+    .leaflet-control-zoom a:hover { background: var(--surface-hover) !important; }
+
+    /* Custom pin */
+    .asset-pin {
+      width: 38px; height: 38px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: var(--accent);
+      border: 2.5px solid rgba(255,255,255,0.25);
+      box-shadow: 0 0 14px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    .asset-pin.selected {
+      background: #fff;
+      border-color: rgba(255,255,255,0.4);
+      box-shadow: 0 0 20px rgba(255,255,255,0.35), 0 3px 10px rgba(0,0,0,0.5);
+    }
+    .asset-pin-label {
+      transform: rotate(45deg);
+      font-size: 11px;
+      font-weight: 700;
+      color: #0a0a0a;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: -0.02em;
+    }
+
+    /* Leaflet popup */
+    .leaflet-popup-content-wrapper {
+      background: rgba(16,16,16,0.97) !important;
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-strong) !important;
+      border-radius: var(--r-lg) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7) !important;
+      color: var(--text-primary) !important;
+      padding: 0 !important;
+    }
+    .leaflet-popup-content { margin: 0 !important; }
+    .leaflet-popup-tip     { background: rgba(16,16,16,0.97) !important; }
+    .leaflet-popup-close-button { color: var(--text-secondary) !important; top: 10px !important; right: 10px !important; }
+
+    .popup-card { padding: 14px 16px 12px; min-width: 200px; }
+    .popup-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .popup-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .popup-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .popup-status.busy { background: var(--accent-dim); color: var(--accent); }
+    .popup-status.idle { background: var(--warning-dim); color: var(--warning); }
+    .popup-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 6px;
+    }
+    .popup-btn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: var(--r-md);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: opacity 0.15s;
+    }
+    .popup-btn:hover { opacity: 0.85; }
+    .popup-btn-primary { background: var(--accent); color: #0a0a0a; }
+    .popup-btn-ghost   {
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    /* ===== CHAT PANEL ===== */
+    .chat-panel {
+      flex: 0 0 38%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px 11px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-header-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .context-badge {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'DM Mono', monospace;
+      opacity: 0;
+      transition: opacity 0.2s;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(163,230,53,0.18);
+    }
+    .context-badge.show { opacity: 1; }
+
+    .chat-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    .chat-thread::-webkit-scrollbar { width: 3px; }
+    .chat-thread::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+    /* Empty state */
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 28px;
+    }
+    .chat-empty-glyph { font-size: 26px; opacity: 0.3; margin-bottom: 4px; }
+    .chat-empty-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+    .chat-empty-sub   { font-size: 12px; max-width: 210px; line-height: 1.55; }
+
+    /* Messages */
+    .msg { display: flex; flex-direction: column; max-width: 93%; }
+    .msg.user { align-self: flex-end; align-items: flex-end; }
+    .msg.ai   { align-self: flex-start; align-items: flex-start; }
+
+    .bubble {
+      padding: 9px 13px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .msg.user .bubble {
+      background: var(--accent);
+      color: #0a0a0a;
+      font-weight: 500;
+      border-radius: var(--r-lg) var(--r-lg) 4px var(--r-lg);
+    }
+    .msg.ai .bubble {
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 4px var(--r-lg) var(--r-lg) var(--r-lg);
+    }
+    .msg.ai .bubble p  { margin: 0 0 6px; }
+    .msg.ai .bubble p:last-child { margin: 0; }
+    .msg.ai .bubble strong { color: var(--accent); font-weight: 600; }
+    .msg.ai .bubble code {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      background: rgba(255,255,255,0.07);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* AI loading dots — from 21st.dev ai-agent-processing-states */
+    @keyframes ai-dots-think {
+      0%, 100% { transform: translateY(0) scale(0.85); opacity: 0.3; filter: blur(0.5px); }
+      50%       { transform: translateY(-3px) scale(1.2); opacity: 1; filter: blur(0px); }
+    }
+    .ai-loader {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 9px 14px;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 4px var(--r-lg) var(--r-lg) var(--r-lg);
+    }
+    .ai-loader-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .ai-loader-dot:nth-child(1) { animation: ai-dots-think 1.4s ease-in-out infinite; animation-delay:   0ms; }
+    .ai-loader-dot:nth-child(2) { animation: ai-dots-think 1.4s ease-in-out infinite; animation-delay: 160ms; }
+    .ai-loader-dot:nth-child(3) { animation: ai-dots-think 1.4s ease-in-out infinite; animation-delay: 320ms; }
+
+    /* Chat input */
+    .chat-input-wrap {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 9px 12px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .chat-input-row:focus-within {
+      border-color: rgba(163,230,53,0.35);
+      box-shadow: 0 0 0 2px rgba(163,230,53,0.07);
+    }
+    #chat-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      resize: none;
+      max-height: 120px;
+      min-height: 20px;
+    }
+    #chat-input::placeholder { color: var(--text-muted); }
+    .send-btn {
+      width: 30px; height: 30px;
+      border-radius: var(--r-sm);
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .send-btn:hover  { background: var(--accent-hover); }
+    .send-btn:active { transform: scale(0.93); }
+    .send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    .send-btn svg { width: 13px; height: 13px; }
+
+    /* ===== DASHBOARD MODAL ===== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(3px);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding-top: var(--topnav-h);
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      width: 62%;
+      height: calc(100vh - var(--topnav-h));
+      background: rgba(11,11,11,0.98);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border-strong);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      animation: slide-up 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    @keyframes slide-up {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-title { font-size: 14px; font-weight: 600; }
+    .modal-asset-tag {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(163,230,53,0.18);
+    }
+    .modal-close-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .modal-close-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-body::-webkit-scrollbar { width: 3px; }
+    .modal-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+    /* Chart cards — glassmorphism adapted from 21st.dev */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .chart-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .chart-card:hover { border-color: var(--border-strong); }
+    .chart-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .chart-card-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+    .chart-card-unit {
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text-muted);
+    }
+    .chart-wrap { height: 100px; }
+
+    /* Full-width trend section */
+    .chart-card-wide {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 14px 16px;
+    }
+    .chart-wrap-wide { height: 140px; }
+
+    /* Summary table */
+    .summary-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+    .summary-title {
+      padding: 11px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-table { width: 100%; border-collapse: collapse; }
+    .summary-table th {
+      padding: 7px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-table td {
+      padding: 9px 16px;
+      font-size: 13px;
+      color: var(--text-primary);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .summary-num { font-weight: 600; }
+    .summary-unit-tag { font-size: 10px; color: var(--text-muted); margin-left: 3px; }
+
+    /* Shimmer skeleton */
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.1) 50%, var(--border) 75%);
+      background-size: 200% auto;
+      animation: shimmer 1.5s linear infinite;
+      border-radius: var(--r-md);
+      height: 11px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPNAV -->
+<nav class="topnav">
+  <div class="topnav-brand">
+    <div class="live-dot"></div>
+    Asset Monitoring Agent
+  </div>
+  <div class="topnav-right">
+    <span class="pill pill-live">LIVE</span>
+    <span class="pill-meta">4 assets · simulation</span>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- MAP -->
+  <div class="map-panel">
+    <div id="map"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <span class="chat-header-title">Agent</span>
+      <span class="context-badge" id="ctx-badge">—</span>
+    </div>
+
+    <div class="chat-thread" id="chat-thread">
+      <div class="chat-empty" id="chat-empty">
+        <div class="chat-empty-glyph">◈</div>
+        <div class="chat-empty-title">Asset Agent</div>
+        <div class="chat-empty-sub">Select an asset on the map, then ask anything about its data.</div>
+      </div>
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Ask about this asset..." rows="1"></textarea>
+        <button class="send-btn" id="send-btn" title="Send">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 12V2M7 2L2.5 6.5M7 2L11.5 6.5" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DASHBOARD MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <span class="modal-title">Dashboard</span>
+        <span class="modal-asset-tag" id="modal-tag">—</span>
+      </div>
+      <button class="modal-close-btn" id="modal-close">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8002';
+let selectedAsset = null;
+let chatHistory   = [];
+let streaming     = false;
+const chartInstances = {};
+
+/* ── ASSET MAP POSITIONS (anonymous simulation) ─────────────── */
+const COORDS = {
+  Asset_A: [24.7148, 46.6742],
+  Asset_B: [24.7175, 46.6788],
+  Asset_C: [24.7118, 46.6805],
+  Asset_D: [24.7162, 46.6718],
+};
+const CHART_CFG = {
+  corrosion_rate: { color: '#a3e635', bg: 'rgba(163,230,53,0.07)', label: 'Corrosion Rate', unit: 'mm/yr' },
+  temperature:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.07)', label: 'Temperature',   unit: '°C'    },
+  pressure:      { color: '#38bdf8', bg: 'rgba(56,189,248,0.07)',  label: 'Pressure',       unit: 'bar'   },
+};
+
+/* ── MAP ─────────────────────────────────────────────────────── */
+const map = L.map('map', { zoomControl: true, attributionControl: false })
+             .setView([24.7145, 46.6762], 15);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
+ .addTo(map);
+
+const leafletMarkers = {};
+
+function pinIcon(name, sel) {
+  const letter = name.split('_')[1];
+  return L.divIcon({
+    className: '',
+    html: `<div class="asset-pin${sel ? ' selected' : ''}"><div class="asset-pin-label">${letter}</div></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 38],
+    popupAnchor: [0, -40],
+  });
+}
+
+function buildPopup(name) {
+  const d = document.createElement('div');
+  d.className = 'popup-card';
+  d.innerHTML = `
+    <div class="popup-name">${name}</div>
+    <div class="popup-row"><span>Status</span><span class="popup-status busy">● Active</span></div>
+    <div class="popup-row"><span>Location</span><span style="color:var(--text-muted);font-size:11px;font-family:'DM Mono',monospace">simulation</span></div>
+    <div class="popup-actions">
+      <button class="popup-btn popup-btn-primary" onclick="openDashboard('${name}')">Dashboard →</button>
+      <button class="popup-btn popup-btn-ghost"   onclick="selectAndAsk('${name}')">Ask Agent</button>
+    </div>`;
+  return d;
+}
+
+async function loadAssets() {
+  try {
+    const res = await fetch(`${API}/api/assets`);
+    const assets = await res.json();
+    assets.forEach(name => {
+      const coords = COORDS[name] || [24.7145, 46.6762];
+      const m = L.marker(coords, { icon: pinIcon(name, false) }).addTo(map);
+      m.bindPopup(L.popup({ closeButton: true, maxWidth: 240 }).setContent(buildPopup(name)));
+      m.on('click', () => { selectAsset(name); m.openPopup(); });
+      leafletMarkers[name] = m;
+    });
+  } catch { /* server not yet running */ }
+}
+
+function selectAsset(name) {
+  selectedAsset = name;
+  Object.entries(leafletMarkers).forEach(([n, m]) => m.setIcon(pinIcon(n, n === name)));
+  const badge = document.getElementById('ctx-badge');
+  badge.textContent = name;
+  badge.classList.add('show');
+}
+
+function selectAndAsk(name) {
+  selectAsset(name);
+  document.getElementById('chat-input').focus();
+}
+
+/* ── DASHBOARD MODAL ─────────────────────────────────────────── */
+async function openDashboard(asset) {
+  selectAsset(asset);
+  document.getElementById('modal-tag').textContent = asset;
+  document.getElementById('overlay').classList.add('open');
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '';
+
+  /* Destroy old Chart instances */
+  Object.values(chartInstances).forEach(c => c.destroy());
+  Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
+
+  const types = Object.keys(CHART_CFG);
+
+  /* ── 3-column card grid ── */
+  const grid = document.createElement('div');
+  grid.className = 'chart-grid';
+  types.forEach(t => {
+    const cfg = CHART_CFG[t];
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    card.innerHTML = `
+      <div class="chart-card-top">
+        <span class="chart-card-label">${cfg.label}</span>
+        <span class="chart-card-unit">${cfg.unit}</span>
+      </div>
+      <div class="chart-wrap"><canvas id="mini-${t}"></canvas></div>`;
+    grid.appendChild(card);
+  });
+  body.appendChild(grid);
+
+  /* ── Full-width corrosion trend ── */
+  const wide = document.createElement('div');
+  wide.className = 'chart-card-wide';
+  wide.innerHTML = `
+    <div class="chart-card-top">
+      <span class="chart-card-label" style="font-size:11px;color:var(--text-secondary)">90-day trend · all metrics</span>
+    </div>
+    <div class="chart-wrap-wide"><canvas id="trend-all"></canvas></div>`;
+  body.appendChild(wide);
+
+  /* ── Summary skeleton ── */
+  const summaryEl = document.createElement('div');
+  summaryEl.className = 'summary-card';
+  summaryEl.id = 'summary-el';
+  summaryEl.innerHTML = `
+    <div class="summary-title">Summary Statistics</div>
+    <div style="padding:14px 16px">
+      <div class="skeleton" style="width:100%"></div>
+      <div class="skeleton" style="width:80%"></div>
+      <div class="skeleton" style="width:90%"></div>
+    </div>`;
+  body.appendChild(summaryEl);
+
+  /* ── Shared Chart.js options ── */
+  const baseOpts = (color) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 600 },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(16,16,16,0.95)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        titleColor: '#f5f5f4',
+        bodyColor: '#a8a29e',
+        padding: 8,
+        cornerRadius: 8,
+      },
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 5 },
+      },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 4 },
+      },
+    },
+  });
+
+  /* ── Fetch & render mini charts ── */
+  const datasets = {};
+  for (const t of types) {
+    try {
+      const res  = await fetch(`${API}/api/measurements/${asset}/${t}`);
+      const data = await res.json();
+      const cfg  = CHART_CFG[t];
+      datasets[t] = data;
+
+      const ctx = document.getElementById(`mini-${t}`);
+      chartInstances[`mini-${t}`] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date.slice(5)),
+          datasets: [{
+            data: data.map(d => d.value),
+            borderColor: cfg.color,
+            backgroundColor: cfg.bg,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            pointHoverRadius: 3,
+            fill: true,
+            tension: 0.4,
+          }],
+        },
+        options: baseOpts(cfg.color),
+      });
+    } catch { /* skip */ }
+  }
+
+  /* ── Multi-line trend chart ── */
+  if (Object.keys(datasets).length) {
+    const firstType = types[0];
+    const labels = datasets[firstType]?.map(d => d.date.slice(5)) || [];
+    const trendCtx = document.getElementById('trend-all');
+    chartInstances['trend-all'] = new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: types.map(t => ({
+          label: CHART_CFG[t].label,
+          data: (datasets[t] || []).map(d => d.value),
+          borderColor: CHART_CFG[t].color,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.4,
+          yAxisID: t === 'corrosion_rate' ? 'y' : 'y2',
+        })),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: '#a8a29e', font: { family: 'DM Mono', size: 10 }, boxWidth: 12 },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(16,16,16,0.95)',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            titleColor: '#f5f5f4',
+            bodyColor: '#a8a29e',
+            padding: 8,
+            cornerRadius: 8,
+          },
+        },
+        scales: {
+          x:  { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 8 } },
+          y:  { position: 'left',  grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#a3e635', font: { family: 'DM Mono', size: 9 } } },
+          y2: { position: 'right', grid: { display: false }, ticks: { color: '#a8a29e', font: { family: 'DM Mono', size: 9 } } },
+        },
+      },
+    });
+  }
+
+  /* ── Fetch & render summary ── */
+  try {
+    const res   = await fetch(`${API}/api/summary/${asset}`);
+    const rows  = await res.json();
+    const el    = document.getElementById('summary-el');
+    el.innerHTML = `
+      <div class="summary-title">Summary Statistics</div>
+      <table class="summary-table">
+        <thead><tr>
+          <th>Metric</th><th>Avg</th><th>Min</th><th>Max</th><th>Unit</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${r.type.replace('_', ' ')}</td>
+              <td><span class="summary-num">${r.avg}</span></td>
+              <td>${r.min}</td>
+              <td>${r.max}</td>
+              <td><span class="summary-unit-tag">${r.unit}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch { /* skip */ }
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('overlay').classList.remove('open');
+});
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('open');
+});
+
+/* ── CHAT ────────────────────────────────────────────────────── */
+function clearEmpty() {
+  const el = document.getElementById('chat-empty');
+  if (el) el.remove();
+}
+
+function appendMsg(role, html) {
+  clearEmpty();
+  const thread = document.getElementById('chat-thread');
+  const msg    = document.createElement('div');
+  msg.className = `msg ${role}`;
+  const bubble  = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML  = html;
+  msg.appendChild(bubble);
+  thread.appendChild(msg);
+  thread.scrollTop = thread.scrollHeight;
+  return bubble;
+}
+
+function showLoader() {
+  clearEmpty();
+  const thread = document.getElementById('chat-thread');
+  const wrap   = document.createElement('div');
+  wrap.className = 'msg ai';
+  wrap.id = 'ai-loader-msg';
+  wrap.innerHTML = `<div class="ai-loader">
+    <div class="ai-loader-dot"></div>
+    <div class="ai-loader-dot"></div>
+    <div class="ai-loader-dot"></div>
+  </div>`;
+  thread.appendChild(wrap);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function removeLoader() {
+  document.getElementById('ai-loader-msg')?.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text  = input.value.trim();
+  if (!text || streaming) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  streaming = true;
+  document.getElementById('send-btn').disabled = true;
+
+  appendMsg('user', text);
+  showLoader();
+
+  try {
+    const res = await fetch(`${API}/api/chat`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message:       text,
+        history:       chatHistory,
+        asset_context: selectedAsset,
+      }),
+    });
+
+    removeLoader();
+    const bubble = appendMsg('ai', '');
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      full += decoder.decode(value);
+      bubble.innerHTML = marked.parse(full);
+      document.getElementById('chat-thread').scrollTop = 9999;
+    }
+
+    chatHistory.push({ role: 'user',      content: selectedAsset ? `[Viewing: ${selectedAsset}]\n${text}` : text });
+    chatHistory.push({ role: 'assistant', content: full });
+
+  } catch {
+    removeLoader();
+    appendMsg('ai', 'Connection error — make sure the server is running on port 8002.');
+  }
+
+  streaming = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+document.getElementById('chat-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+/* ── INIT ────────────────────────────────────────────────────── */
+loadAssets();
+</script>
+</body>
+</html>
