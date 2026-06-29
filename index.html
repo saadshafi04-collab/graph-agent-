@@ -14,23 +14,23 @@
   <style>
     /* ===== DESIGN TOKENS ===== */
     :root {
-      --bg:              #0a0a0a;
-      --surface:         rgba(255,255,255,0.05);
-      --surface-hover:   rgba(255,255,255,0.08);
-      --glass:           rgba(255,255,255,0.04);
-      --border:          rgba(255,255,255,0.08);
-      --border-strong:   rgba(255,255,255,0.13);
-      --accent:          #a3e635;
-      --accent-hover:    #bef264;
-      --accent-dim:      rgba(163,230,53,0.12);
-      --accent-glow:     rgba(163,230,53,0.25);
-      --text-primary:    #f5f5f4;
-      --text-secondary:  #a8a29e;
-      --text-muted:      #57534e;
+      --bg:              #f8f9fa;
+      --surface:         rgba(0,0,0,0.03);
+      --surface-hover:   rgba(0,0,0,0.06);
+      --glass:           #ffffff;
+      --border:          rgba(0,0,0,0.1);
+      --border-strong:   rgba(0,0,0,0.18);
+      --accent:          #2563eb;
+      --accent-hover:    #1d4ed8;
+      --accent-dim:      rgba(37,99,235,0.08);
+      --accent-glow:     rgba(37,99,235,0.2);
+      --text-primary:    #1a1a1a;
+      --text-secondary:  #6b7280;
+      --text-muted:      #9ca3af;
       --warning:         #f59e0b;
-      --warning-dim:     rgba(245,158,11,0.12);
-      --blue:            #38bdf8;
-      --blue-dim:        rgba(56,189,248,0.12);
+      --warning-dim:     rgba(245,158,11,0.1);
+      --blue:            #0ea5e9;
+      --blue-dim:        rgba(14,165,233,0.1);
       --r-sm:  6px;
       --r-md:  10px;
       --r-lg:  14px;
@@ -54,7 +54,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       height: var(--topnav-h);
-      background: rgba(10,10,10,0.9);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -97,7 +97,7 @@
     .pill-live {
       background: var(--accent-dim);
       color: var(--accent);
-      border: 1px solid rgba(163,230,53,0.2);
+      border: 1px solid rgba(37,99,235,0.2);
     }
     .pill-meta {
       color: var(--text-muted);
@@ -120,10 +120,10 @@
     }
     #map { width: 100%; height: 100%; }
 
-    .leaflet-tile-pane         { filter: brightness(0.88) contrast(1.06) saturate(0.7); }
+    .leaflet-tile-pane         { filter: none; }
     .leaflet-control-attribution { display: none; }
     .leaflet-control-zoom a {
-      background: rgba(18,18,18,0.9) !important;
+      background: rgba(255,255,255,0.9) !important;
       color: var(--text-primary) !important;
       border-color: var(--border) !important;
       backdrop-filter: blur(8px);
@@ -136,8 +136,8 @@
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       background: var(--accent);
-      border: 2.5px solid rgba(255,255,255,0.25);
-      box-shadow: 0 0 14px var(--accent-glow), 0 3px 10px rgba(0,0,0,0.5);
+      border: 2.5px solid rgba(255,255,255,0.7);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -145,31 +145,31 @@
       transition: box-shadow 0.2s;
     }
     .asset-pin.selected {
-      background: #fff;
-      border-color: rgba(255,255,255,0.4);
-      box-shadow: 0 0 20px rgba(255,255,255,0.35), 0 3px 10px rgba(0,0,0,0.5);
+      background: #1a1a1a;
+      border-color: rgba(0,0,0,0.3);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
     .asset-pin-label {
       transform: rotate(45deg);
       font-size: 11px;
       font-weight: 700;
-      color: #0a0a0a;
+      color: #ffffff;
       font-family: 'DM Mono', monospace;
       letter-spacing: -0.02em;
     }
 
     /* Leaflet popup */
     .leaflet-popup-content-wrapper {
-      background: rgba(16,16,16,0.97) !important;
+      background: #ffffff !important;
       backdrop-filter: blur(16px);
-      border: 1px solid var(--border-strong) !important;
+      border: 1px solid var(--border) !important;
       border-radius: var(--r-lg) !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.7) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
       color: var(--text-primary) !important;
       padding: 0 !important;
     }
     .leaflet-popup-content { margin: 0 !important; }
-    .leaflet-popup-tip     { background: rgba(16,16,16,0.97) !important; }
+    .leaflet-popup-tip     { background: #ffffff !important; }
     .leaflet-popup-close-button { color: var(--text-secondary) !important; top: 10px !important; right: 10px !important; }
 
     .popup-card { padding: 14px 16px 12px; min-width: 200px; }
@@ -195,8 +195,8 @@
       padding: 2px 8px;
       border-radius: 100px;
     }
-    .popup-status.busy { background: var(--accent-dim); color: var(--accent); }
-    .popup-status.idle { background: var(--warning-dim); color: var(--warning); }
+    .popup-status.busy { background: #dcfce7; color: #16a34a; }
+    .popup-status.idle { background: var(--warning-dim); color: #b45309; }
     .popup-actions {
       margin-top: 10px;
       display: flex;
@@ -214,7 +214,7 @@
       transition: opacity 0.15s;
     }
     .popup-btn:hover { opacity: 0.85; }
-    .popup-btn-primary { background: var(--accent); color: #0a0a0a; }
+    .popup-btn-primary { background: var(--accent); color: #ffffff; }
     .popup-btn-ghost   {
       background: var(--surface);
       color: var(--text-secondary);
@@ -250,7 +250,7 @@
       transition: opacity 0.2s;
       background: var(--accent-dim);
       color: var(--accent);
-      border: 1px solid rgba(163,230,53,0.18);
+      border: 1px solid rgba(37,99,235,0.15);
     }
     .context-badge.show { opacity: 1; }
 
@@ -282,6 +282,39 @@
     .chat-empty-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
     .chat-empty-sub   { font-size: 12px; max-width: 210px; line-height: 1.55; }
 
+    /* Prompt suggestions */
+    .prompt-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 14px;
+      max-width: 340px;
+    }
+    .prompt-chip {
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .prompt-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      transform: translateY(-1px);
+    }
+    .prompt-chip:active {
+      transform: scale(0.97);
+    }
+
     /* Messages */
     .msg { display: flex; flex-direction: column; max-width: 93%; }
     .msg.user { align-self: flex-end; align-items: flex-end; }
@@ -294,13 +327,12 @@
     }
     .msg.user .bubble {
       background: var(--accent);
-      color: #0a0a0a;
+      color: #ffffff;
       font-weight: 500;
       border-radius: var(--r-lg) var(--r-lg) 4px var(--r-lg);
     }
     .msg.ai .bubble {
-      background: var(--glass);
-      backdrop-filter: blur(8px);
+      background: #ffffff;
       border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 4px var(--r-lg) var(--r-lg) var(--r-lg);
@@ -311,7 +343,7 @@
     .msg.ai .bubble code {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.05);
       padding: 1px 5px;
       border-radius: 4px;
     }
@@ -326,8 +358,7 @@
       align-items: center;
       gap: 4px;
       padding: 9px 14px;
-      background: var(--glass);
-      backdrop-filter: blur(8px);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 4px var(--r-lg) var(--r-lg) var(--r-lg);
     }
@@ -350,16 +381,15 @@
       display: flex;
       align-items: flex-end;
       gap: 8px;
-      background: var(--glass);
-      backdrop-filter: blur(8px);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 9px 12px;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
     .chat-input-row:focus-within {
-      border-color: rgba(163,230,53,0.35);
-      box-shadow: 0 0 0 2px rgba(163,230,53,0.07);
+      border-color: rgba(37,99,235,0.4);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.08);
     }
     #chat-input {
       flex: 1;
@@ -389,12 +419,13 @@
     .send-btn:active { transform: scale(0.93); }
     .send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
     .send-btn svg { width: 13px; height: 13px; }
+    .send-btn svg path { stroke: #ffffff; }
 
     /* ===== DASHBOARD MODAL ===== */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.25);
       backdrop-filter: blur(3px);
       z-index: 2000;
       display: none;
@@ -407,9 +438,9 @@
     .modal {
       width: 62%;
       height: calc(100vh - var(--topnav-h));
-      background: rgba(11,11,11,0.98);
+      background: #f8f9fa;
       backdrop-filter: blur(24px);
-      border-top: 1px solid var(--border-strong);
+      border-top: 1px solid var(--border);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -442,7 +473,7 @@
       font-weight: 500;
       background: var(--accent-dim);
       color: var(--accent);
-      border: 1px solid rgba(163,230,53,0.18);
+      border: 1px solid rgba(37,99,235,0.15);
     }
     .modal-close-btn {
       width: 28px; height: 28px;
@@ -469,48 +500,118 @@
     .modal-body::-webkit-scrollbar { width: 3px; }
     .modal-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
-    /* Chart cards — glassmorphism adapted from 21st.dev */
+    /* ===== STAT CARDS ROW ===== */
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .stat-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 16px 18px;
+      transition: border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+    }
+    .stat-card.green::after  { background: #2563eb; }
+    .stat-card.amber::after  { background: #f59e0b; }
+    .stat-card.blue::after   { background: #0ea5e9; }
+    .stat-card.neutral::after { background: #9ca3af; }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-value.green  { color: #2563eb; }
+    .stat-value.amber  { color: #f59e0b; }
+    .stat-value.blue   { color: #0ea5e9; }
+    .stat-value.neutral { color: #1a1a1a; }
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ===== CHART CARDS ===== */
     .chart-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
     .chart-card {
       background: var(--glass);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
-      padding: 14px 16px;
+      padding: 16px 18px;
       transition: border-color 0.2s;
     }
     .chart-card:hover { border-color: var(--border-strong); }
     .chart-card-top {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .chart-card-label {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
     .chart-card-unit {
       font-size: 10px;
       font-family: 'DM Mono', monospace;
       color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 2px 8px;
+      border-radius: 100px;
     }
-    .chart-wrap { height: 100px; }
+    .chart-wrap { height: 130px; }
 
-    /* Full-width trend section */
+    /* Full-width trend */
     .chart-card-wide {
       background: var(--glass);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
-      padding: 14px 16px;
+      padding: 16px 18px;
     }
-    .chart-wrap-wide { height: 140px; }
+    .chart-wrap-wide { height: 160px; }
+
+    /* Status row */
+    .status-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 12px;
+    }
+    .donut-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .donut-wrap { width: 120px; height: 120px; margin: 8px 0; }
 
     /* Summary table */
     .summary-card {
@@ -520,17 +621,23 @@
       overflow: hidden;
     }
     .summary-title {
-      padding: 11px 16px;
-      font-size: 10px;
+      padding: 13px 18px;
+      font-size: 11px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .summary-title-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
     }
     .summary-table { width: 100%; border-collapse: collapse; }
     .summary-table th {
-      padding: 7px 16px;
+      padding: 9px 18px;
       text-align: left;
       font-size: 10px;
       font-weight: 600;
@@ -541,20 +648,35 @@
       border-bottom: 1px solid var(--border);
     }
     .summary-table td {
-      padding: 9px 16px;
+      padding: 11px 18px;
       font-size: 13px;
       color: var(--text-primary);
       border-bottom: 1px solid rgba(255,255,255,0.03);
     }
     .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:hover td { background: rgba(0,0,0,0.02); }
     .summary-table td:first-child {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      color: var(--accent);
       font-weight: 500;
     }
-    .summary-num { font-weight: 600; }
+    .metric-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .summary-num { font-weight: 700; font-family: 'DM Mono', monospace; font-size: 13px; }
     .summary-unit-tag { font-size: 10px; color: var(--text-muted); margin-left: 3px; }
+    .summary-bar {
+      display: inline-block;
+      height: 4px;
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-left: 8px;
+      opacity: 0.5;
+    }
 
     /* Shimmer skeleton */
     @keyframes shimmer {
@@ -562,7 +684,7 @@
       100% { background-position:  200% center; }
     }
     .skeleton {
-      background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.1) 50%, var(--border) 75%);
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
       background-size: 200% auto;
       animation: shimmer 1.5s linear infinite;
       border-radius: var(--r-md);
@@ -605,6 +727,14 @@
         <div class="chat-empty-glyph">◈</div>
         <div class="chat-empty-title">Asset Agent</div>
         <div class="chat-empty-sub">Select an asset on the map, then ask anything about its data.</div>
+        <div class="prompt-suggestions" id="prompt-suggestions">
+          <button class="prompt-chip" data-prompt="What was the corrosion rate on 2026-02-15?">Corrosion rate on a date?</button>
+          <button class="prompt-chip" data-prompt="Show me a summary of all metrics for this asset.">Summarize all metrics</button>
+          <button class="prompt-chip" data-prompt="What are the min and max pressure readings?">Pressure min and max?</button>
+          <button class="prompt-chip" data-prompt="What is the busy vs idle status breakdown for this asset?">Busy vs idle breakdown?</button>
+          <button class="prompt-chip" data-prompt="How has the temperature changed over the 90-day period?">Temperature trend over 90 days?</button>
+          <button class="prompt-chip" data-prompt="Which asset has the highest average corrosion rate?">Highest corrosion across assets?</button>
+        </div>
       </div>
     </div>
 
@@ -645,20 +775,20 @@ const chartInstances = {};
 
 /* ── ASSET MAP POSITIONS (anonymous simulation) ─────────────── */
 const COORDS = {
-  Asset_A: [24.7148, 46.6742],
-  Asset_B: [24.7175, 46.6788],
-  Asset_C: [24.7118, 46.6805],
-  Asset_D: [24.7162, 46.6718],
+  Asset_A: [26.2961, 50.2080],
+  Asset_B: [26.4390, 50.1010],
+  Asset_C: [26.1920, 50.1850],
+  Asset_D: [26.3540, 50.1540],
 };
 const CHART_CFG = {
-  corrosion_rate: { color: '#a3e635', bg: 'rgba(163,230,53,0.07)', label: 'Corrosion Rate', unit: 'mm/yr' },
-  temperature:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.07)', label: 'Temperature',   unit: '°C'    },
-  pressure:      { color: '#38bdf8', bg: 'rgba(56,189,248,0.07)',  label: 'Pressure',       unit: 'bar'   },
+  corrosion_rate: { color: '#2563eb', bg: 'rgba(37,99,235,0.08)', label: 'Corrosion Rate', unit: 'mm/yr' },
+  temperature:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', label: 'Temperature',   unit: '°C'    },
+  pressure:      { color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)',  label: 'Pressure',       unit: 'bar'   },
 };
 
 /* ── MAP ─────────────────────────────────────────────────────── */
 const map = L.map('map', { zoomControl: true, attributionControl: false })
-             .setView([24.7145, 46.6762], 15);
+             .setView([26.3200, 50.1500], 11);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
  .addTo(map);
@@ -695,7 +825,7 @@ async function loadAssets() {
     const res = await fetch(`${API}/api/assets`);
     const assets = await res.json();
     assets.forEach(name => {
-      const coords = COORDS[name] || [24.7145, 46.6762];
+      const coords = COORDS[name] || [26.3200, 50.1500];
       const m = L.marker(coords, { icon: pinIcon(name, false) }).addTo(map);
       m.bindPopup(L.popup({ closeButton: true, maxWidth: 240 }).setContent(buildPopup(name)));
       m.on('click', () => { selectAsset(name); m.openPopup(); });
@@ -726,16 +856,27 @@ async function openDashboard(asset) {
   const body = document.getElementById('modal-body');
   body.innerHTML = '';
 
-  /* Destroy old Chart instances */
   Object.values(chartInstances).forEach(c => c.destroy());
   Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
 
   const types = Object.keys(CHART_CFG);
+  const METRIC_COLORS = { corrosion_rate: '#2563eb', temperature: '#f59e0b', pressure: '#0ea5e9' };
 
-  /* ── 3-column card grid ── */
+  /* ── Stat cards skeleton ── */
+  const statRow = document.createElement('div');
+  statRow.className = 'stat-row';
+  statRow.id = 'stat-row';
+  statRow.innerHTML = `
+    <div class="stat-card green"><div class="stat-label">Avg Corrosion</div><div class="skeleton" style="width:60%;height:26px;margin-bottom:6px"></div><div class="skeleton" style="width:40%;height:11px"></div></div>
+    <div class="stat-card amber"><div class="stat-label">Avg Temperature</div><div class="skeleton" style="width:60%;height:26px;margin-bottom:6px"></div><div class="skeleton" style="width:40%;height:11px"></div></div>
+    <div class="stat-card blue"><div class="stat-label">Avg Pressure</div><div class="skeleton" style="width:60%;height:26px;margin-bottom:6px"></div><div class="skeleton" style="width:40%;height:11px"></div></div>
+    <div class="stat-card neutral"><div class="stat-label">Data Points</div><div class="skeleton" style="width:60%;height:26px;margin-bottom:6px"></div><div class="skeleton" style="width:40%;height:11px"></div></div>`;
+  body.appendChild(statRow);
+
+  /* ── 2-column chart grid (corrosion + temperature) ── */
   const grid = document.createElement('div');
   grid.className = 'chart-grid';
-  types.forEach(t => {
+  ['corrosion_rate', 'temperature'].forEach(t => {
     const cfg = CHART_CFG[t];
     const card = document.createElement('div');
     card.className = 'chart-card';
@@ -749,12 +890,29 @@ async function openDashboard(asset) {
   });
   body.appendChild(grid);
 
-  /* ── Full-width corrosion trend ── */
+  /* ── Pressure + status donut row ── */
+  const statusRow = document.createElement('div');
+  statusRow.className = 'status-row';
+  statusRow.innerHTML = `
+    <div class="donut-card">
+      <div class="chart-card-label" style="margin-bottom:4px">Utilization</div>
+      <div class="donut-wrap"><canvas id="donut-status"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-top">
+        <span class="chart-card-label">${CHART_CFG.pressure.label}</span>
+        <span class="chart-card-unit">${CHART_CFG.pressure.unit}</span>
+      </div>
+      <div class="chart-wrap"><canvas id="mini-pressure"></canvas></div>
+    </div>`;
+  body.appendChild(statusRow);
+
+  /* ── Full-width trend ── */
   const wide = document.createElement('div');
   wide.className = 'chart-card-wide';
   wide.innerHTML = `
     <div class="chart-card-top">
-      <span class="chart-card-label" style="font-size:11px;color:var(--text-secondary)">90-day trend · all metrics</span>
+      <span class="chart-card-label">90-Day Trend · All Metrics</span>
     </div>
     <div class="chart-wrap-wide"><canvas id="trend-all"></canvas></div>`;
   body.appendChild(wide);
@@ -764,54 +922,58 @@ async function openDashboard(asset) {
   summaryEl.className = 'summary-card';
   summaryEl.id = 'summary-el';
   summaryEl.innerHTML = `
-    <div class="summary-title">Summary Statistics</div>
-    <div style="padding:14px 16px">
+    <div class="summary-title"><span class="summary-title-dot"></span> Summary Statistics</div>
+    <div style="padding:14px 18px">
       <div class="skeleton" style="width:100%"></div>
       <div class="skeleton" style="width:80%"></div>
       <div class="skeleton" style="width:90%"></div>
     </div>`;
   body.appendChild(summaryEl);
 
-  /* ── Shared Chart.js options ── */
-  const baseOpts = (color) => ({
+  /* ── Chart.js shared config ── */
+  const tooltipCfg = {
+    backgroundColor: '#ffffff',
+    borderColor: 'rgba(0,0,0,0.1)',
+    borderWidth: 1,
+    titleColor: '#1a1a1a',
+    bodyColor: '#6b7280',
+    padding: 10,
+    cornerRadius: 8,
+    titleFont: { family: 'DM Mono', size: 11 },
+    bodyFont: { family: 'DM Mono', size: 11 },
+    displayColors: false,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  };
+  const baseOpts = () => ({
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 600 },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: 'rgba(16,16,16,0.95)',
-        borderColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 1,
-        titleColor: '#f5f5f4',
-        bodyColor: '#a8a29e',
-        padding: 8,
-        cornerRadius: 8,
-      },
-    },
+    animation: { duration: 500 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: false }, tooltip: tooltipCfg },
     scales: {
-      x: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
-        ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 5 },
-      },
-      y: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
-        ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 4 },
-      },
+      x: { grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false }, ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 6 } },
+      y: { grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false }, ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 5 } },
     },
   });
 
-  /* ── Fetch & render mini charts ── */
+  /* ── Fetch data & render ── */
   const datasets = {};
+  let busyCount = 0, idleCount = 0;
+
   for (const t of types) {
     try {
       const res  = await fetch(`${API}/api/measurements/${asset}/${t}`);
       const data = await res.json();
-      const cfg  = CHART_CFG[t];
       datasets[t] = data;
 
-      const ctx = document.getElementById(`mini-${t}`);
-      chartInstances[`mini-${t}`] = new Chart(ctx, {
+      if (t === types[0]) {
+        data.forEach(d => { if (d.status === 'busy') busyCount++; else idleCount++; });
+      }
+
+      const canvas = document.getElementById(`mini-${t}`);
+      const cfg    = CHART_CFG[t];
+
+      chartInstances[`mini-${t}`] = new Chart(canvas, {
         type: 'line',
         data: {
           labels: data.map(d => d.date.slice(5)),
@@ -819,19 +981,109 @@ async function openDashboard(asset) {
             data: data.map(d => d.value),
             borderColor: cfg.color,
             backgroundColor: cfg.bg,
-            borderWidth: 1.5,
-            pointRadius: 0,
-            pointHoverRadius: 3,
+            borderWidth: 2,
+            pointRadius: 1,
+            pointHoverRadius: 4,
+            pointHoverBackgroundColor: cfg.color,
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
             fill: true,
-            tension: 0.4,
+            tension: 0.3,
           }],
         },
-        options: baseOpts(cfg.color),
+        options: baseOpts(),
       });
     } catch { /* skip */ }
   }
 
-  /* ── Multi-line trend chart ── */
+  /* ── Populate stat cards ── */
+  try {
+    const res  = await fetch(`${API}/api/summary/${asset}`);
+    const rows = await res.json();
+    const statData = {};
+    rows.forEach(r => { statData[r.type] = r; });
+
+    const cr = statData['corrosion_rate'];
+    const tp = statData['temperature'];
+    const pr = statData['pressure'];
+    const total = Object.values(datasets).reduce((s, d) => s + d.length, 0);
+
+    document.getElementById('stat-row').innerHTML = `
+      <div class="stat-card green">
+        <div class="stat-label">Avg Corrosion</div>
+        <div class="stat-value green">${cr ? cr.avg : '—'}</div>
+        <div class="stat-sub">${cr ? cr.unit + ' · range ' + cr.min + '–' + cr.max : ''}</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Avg Temperature</div>
+        <div class="stat-value amber">${tp ? tp.avg : '—'}</div>
+        <div class="stat-sub">${tp ? tp.unit + ' · range ' + tp.min + '–' + tp.max : ''}</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Avg Pressure</div>
+        <div class="stat-value blue">${pr ? pr.avg : '—'}</div>
+        <div class="stat-sub">${pr ? pr.unit + ' · range ' + pr.min + '–' + pr.max : ''}</div>
+      </div>
+      <div class="stat-card neutral">
+        <div class="stat-label">Data Points</div>
+        <div class="stat-value neutral">${total}</div>
+        <div class="stat-sub">90 days · 3 metrics</div>
+      </div>`;
+
+    /* ── Summary table ── */
+    const el = document.getElementById('summary-el');
+    el.innerHTML = `
+      <div class="summary-title"><span class="summary-title-dot"></span> Summary Statistics</div>
+      <table class="summary-table">
+        <thead><tr>
+          <th>Metric</th><th>Average</th><th>Min</th><th>Max</th><th>Unit</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(r => {
+            const color = METRIC_COLORS[r.type] || '#a8a29e';
+            const range = r.max - r.min;
+            const pct = range > 0 ? Math.round(((r.avg - r.min) / range) * 100) : 50;
+            return `<tr>
+              <td><span class="metric-dot" style="background:${color}"></span>${r.type.replace('_', ' ')}</td>
+              <td><span class="summary-num" style="color:${color}">${r.avg}</span><span class="summary-bar" style="width:${pct}px;background:${color}"></span></td>
+              <td>${r.min}</td>
+              <td>${r.max}</td>
+              <td><span class="summary-unit-tag">${r.unit}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  } catch { /* skip */ }
+
+  /* ── Donut chart ── */
+  try {
+    const donutCtx = document.getElementById('donut-status');
+    chartInstances['donut-status'] = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Busy', 'Idle'],
+        datasets: [{
+          data: [busyCount, idleCount],
+          backgroundColor: ['#2563eb', '#e5e7eb'],
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { color: '#6b7280', font: { family: 'DM Mono', size: 10 }, boxWidth: 10, padding: 8 } },
+          tooltip: tooltipCfg,
+        },
+      },
+    });
+  } catch { /* skip */ }
+
+  /* ── Multi-line trend ── */
   if (Object.keys(datasets).length) {
     const firstType = types[0];
     const labels = datasets[firstType]?.map(d => d.date.slice(5)) || [];
@@ -845,63 +1097,30 @@ async function openDashboard(asset) {
           data: (datasets[t] || []).map(d => d.value),
           borderColor: CHART_CFG[t].color,
           backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointRadius: 0,
-          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 1,
+          pointHoverRadius: 4,
+          tension: 0.3,
           yAxisID: t === 'corrosion_rate' ? 'y' : 'y2',
         })),
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 600 },
+        animation: { duration: 500 },
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: {
-            display: true,
-            labels: { color: '#a8a29e', font: { family: 'DM Mono', size: 10 }, boxWidth: 12 },
-          },
-          tooltip: {
-            backgroundColor: 'rgba(16,16,16,0.95)',
-            borderColor: 'rgba(255,255,255,0.1)',
-            borderWidth: 1,
-            titleColor: '#f5f5f4',
-            bodyColor: '#a8a29e',
-            padding: 8,
-            cornerRadius: 8,
-          },
+          legend: { display: true, position: 'top', align: 'end', labels: { color: '#6b7280', font: { family: 'DM Mono', size: 10 }, boxWidth: 10, usePointStyle: true, pointStyle: 'circle', padding: 14 } },
+          tooltip: tooltipCfg,
         },
         scales: {
-          x:  { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#57534e', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 8 } },
-          y:  { position: 'left',  grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#a3e635', font: { family: 'DM Mono', size: 9 } } },
-          y2: { position: 'right', grid: { display: false }, ticks: { color: '#a8a29e', font: { family: 'DM Mono', size: 9 } } },
+          x:  { grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false }, ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 8 } },
+          y:  { position: 'left',  grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false }, ticks: { color: '#2563eb', font: { family: 'DM Mono', size: 9 } } },
+          y2: { position: 'right', grid: { display: false }, ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 9 } } },
         },
       },
     });
   }
-
-  /* ── Fetch & render summary ── */
-  try {
-    const res   = await fetch(`${API}/api/summary/${asset}`);
-    const rows  = await res.json();
-    const el    = document.getElementById('summary-el');
-    el.innerHTML = `
-      <div class="summary-title">Summary Statistics</div>
-      <table class="summary-table">
-        <thead><tr>
-          <th>Metric</th><th>Avg</th><th>Min</th><th>Max</th><th>Unit</th>
-        </tr></thead>
-        <tbody>
-          ${rows.map(r => `
-            <tr>
-              <td>${r.type.replace('_', ' ')}</td>
-              <td><span class="summary-num">${r.avg}</span></td>
-              <td>${r.min}</td>
-              <td>${r.max}</td>
-              <td><span class="summary-unit-tag">${r.unit}</span></td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch { /* skip */ }
 }
 
 document.getElementById('modal-close').addEventListener('click', () => {
@@ -1009,6 +1228,17 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
 document.getElementById('chat-input').addEventListener('input', function() {
   this.style.height = 'auto';
   this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+/* ── PROMPT SUGGESTIONS ─────────────────────────────────────── */
+document.getElementById('prompt-suggestions').addEventListener('click', e => {
+  const chip = e.target.closest('.prompt-chip');
+  if (!chip) return;
+  const input = document.getElementById('chat-input');
+  input.value = chip.dataset.prompt;
+  input.focus();
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
 });
 
 /* ── INIT ────────────────────────────────────────────────────── */

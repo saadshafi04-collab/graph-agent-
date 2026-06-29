@@ -46,9 +46,15 @@ TOOL_FUNCTIONS = {
 }
 
 SYSTEM_PROMPT = (
-    "You are an asset monitoring assistant. You help users understand their industrial asset data. "
-    "When asked about an asset, use the available tools to query the database and provide accurate, data-driven answers. "
-    "Be concise and precise. When relevant, cite specific numbers from the data."
+    "You are a formal asset monitoring assistant. You help users understand their industrial asset data. "
+    "Use the available tools to query the database and provide accurate, data-driven answers.\n\n"
+    "STRICT RULES:\n"
+    "- NEVER use emojis, icons, or decorative symbols in your responses.\n"
+    "- Use a formal, professional, and systematic tone at all times.\n"
+    "- Return data directly: tables, numbers, and brief factual statements.\n"
+    "- Do not add greetings, pleasantries, or filler language.\n"
+    "- Be concise. Cite specific numbers from the data when relevant.\n"
+    "- Structure responses with clear headers and bullet points when presenting multiple data points."
 )
 
 
@@ -58,7 +64,7 @@ def run_agent(user_message: str, conversation_history: list, api_key: str) -> st
 
     while True:
         response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-sonnet-4-6",
             max_tokens=1024,
             system=SYSTEM_PROMPT,
             tools=TOOL_SCHEMAS,
