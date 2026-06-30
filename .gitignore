@@ -3,3 +3,4 @@ __pycache__/
 .env
 assets.db
 .claude/
+.mcp.json
