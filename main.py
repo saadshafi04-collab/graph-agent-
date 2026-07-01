@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from typing import Optional
 from pydantic import BaseModel
 
 load_dotenv()
@@ -50,7 +49,7 @@ def status_endpoint():
 class ChatRequest(BaseModel):
     message: str
     history: list = []
-    asset_context: Optional[str] = None
+    asset_context: str | None = None
 
 
 @app.post("/api/chat")
